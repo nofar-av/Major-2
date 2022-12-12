@@ -3,6 +3,17 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 
+from matplotlib import pylab
+params = {'xtick.labelsize': 18,
+ 'ytick.labelsize': 18,
+ 'axes.titlesize' : 22,
+ 'axes.labelsize' : 20,
+ 'legend.fontsize': 18,
+ 'legend.title_fontsize': 22,
+ 'figure.titlesize': 24
+ }
+pylab.rcParams.update(params)
+
 #a
 df = pd.read_csv(r'virus_data.csv')
 
@@ -11,7 +22,7 @@ from sklearn.model_selection import train_test_split
 train , test = train_test_split(df, test_size = 0.2, random_state = (73 + 98)) 
 
 #c - prepare data
-# from prepare import prepare_data
+from prepare import prepare_data
 
 norm_train = prepare_data(train, train)
 norm_test = prepare_data(train, test)
@@ -93,14 +104,16 @@ train_scores = np.empty(shape=len(k_values), dtype=float)
 
 for index, k in enumerate(k_values):
   knn = KNeighborsClassifier(n_neighbors=k)
-  knn.fit(norm_train, norm_train.spread)
-  results = cross_validate(knn, norm_train, y=norm_train.spread, cv=8,  return_train_score=True)
+  knn.fit(norm_train.drop(['risk', 'spread'], axis=1, inplace=False), norm_train.spread)
+  results = cross_validate(knn, norm_train.drop(['risk', 'spread'], axis=1, inplace=False), y=norm_train.spread, cv=8,  return_train_score=True)
   train_scores[index] = results["train_score"].mean()
   validation_scores[index] = results["test_score"].mean()
 
   
 print(train_scores)
 print(validation_scores)
+print("best k is:", k_values[np.argmax(validation_scores)])
+print("its mean training and validation accuracies:", train_scores[np.argmax(validation_scores)], validation_scores[np.argmax(validation_scores)])
 
 g = plt.semilogx(k_values, train_scores, color = 'orange', markersize = 15)
 g = plt.semilogx(k_values, validation_scores, color = 'teal', markersize = 15)
@@ -125,3 +138,27 @@ print("train accuracy is "+ str(trainAcc))
 
 plt.figure(figsize=(26,12))
 plot_tree(decision_tree, feature_names=norm_train.columns, filled=True, fontsize=10)
+
+
+#Q8
+from sklearn.model_selection import GridSearchCV
+parameters = {'max_depth': range(1,20,2), 'min_samples_leaf': range(1,20,2)}
+Decision_tree = DecisionTreeClassifier(criterion="entropy")
+clf = GridSearchCV(Decision_tree, parameters, cv=8, return_train_score=True)
+clf.fit(norm_train.drop(['risk', 'spread'], axis=1, inplace=False), norm_train.risk)
+print(clf.best_estimator_)
+
+pvt_train_mean = pd.pivot_table(pd.DataFrame(clf.cv_results_), values='mean_train_score', index='param_max_depth', columns='param_min_samples_leaf')
+pvt_validation_mean = pd.pivot_table(pd.DataFrame(clf.cv_results_), values='mean_test_score', index='param_max_depth', columns='param_min_samples_leaf')
+
+fig, axes = plt.subplots(1,2, figsize=(18, 5))
+axes[0] = sns.heatmap(pvt_train_mean, vmin=0.5, vmax=1, cmap="hot", annot=True, ax=axes[0])
+axes[0].set_title("mean train accuracy")
+axes[0].set_xlabel("min_samples_leaf")
+axes[0].set_ylabel("max_depth")
+
+axes[1] = sns.heatmap(pvt_validation_mean, vmin=0.5, vmax=1, cmap="hot", annot=True, ax=axes[1])
+axes[1].set_title("mean validation accuracy")
+axes[1].set_xlabel("min_samples_leaf")
+axes[1].set_ylabel("max_depth")
+plt.show()
