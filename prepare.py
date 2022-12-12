@@ -31,7 +31,7 @@ def prepare_df(df):
   #converting bools and strings to ints
   bool_variables =data.select_dtypes(include=['bool']).columns
   data[bool_variables] = data[bool_variables].astype(int).replace([0, 1], [-1, 1])
-  data.drop(["patient_id", "pcr_date", "pcr_location"], axis=1, inplace=True)
+  data.drop(["patient_id", "pcr_date", "current_location"], axis=1, inplace=True)
   return data
 
 def prepare_data(training_data, new_data):
@@ -41,7 +41,7 @@ def prepare_data(training_data, new_data):
   minmax_scaler = MinMaxScaler(feature_range=(-1,1))
   standard_scaler = StandardScaler()
 
-  minmaxed_cols = ['sport_activity', 'PCR_01', 'PCR_02', 'PCR_03', 'PCR_04', 'PCR_05', 'PCR_06', 'PCR_07', 'PCR_09', 'PCR_10', 'location_a', 'location_b']
+  minmaxed_cols = ['sport_activity', 'PCR_01', 'PCR_02', 'PCR_03', 'PCR_04', 'PCR_05', 'PCR_06', 'PCR_07', 'PCR_09', 'PCR_10']
   standardized_cols = ['age', 'weight', 'num_of_siblings','household_income', 'happiness_score','conversations_per_day', 'sugar_levels','PCR_08']
   #fitting the scalers to training data
   minmax_scaler.fit(prepared_train[minmaxed_cols])
