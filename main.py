@@ -10,8 +10,14 @@ df = pd.read_csv(r'virus_data.csv')
 from sklearn.model_selection import train_test_split
 train , test = train_test_split(df, test_size = 0.2, random_state = (73 + 98)) 
 
+#c - prepare data
+# from prepare import prepare_data
+
+norm_train = prepare_data(train, train)
+norm_test = prepare_data(train, test)
+
 #Visualization and basic analysis - task
-DataFrame = train[["PCR_01", "PCR_02", "spread"]] #TODO::NEEDS TO BE NORMALIZED
+DataFrame = norm_train[["PCR_01", "PCR_02", "spread"]] #TODO::NEEDS TO BE NORMALIZED
 
 #Q1
 g = sns.jointplot(DataFrame.PCR_01, DataFrame.PCR_02, hue=DataFrame.spread, palette='pastel')
@@ -74,7 +80,6 @@ for k in [1, 501]:
   knn.fit(DataFrame[["PCR_01", "PCR_02"]], DataFrame.spread)
   visualize_clf(knn, DataFrame[["PCR_01", "PCR_02"]], DataFrame.spread, "kNN Model (k = " + str(k) + ")", "PCR_01", "PCR_02")
 
-norm_test = prepare_data(train, test)
 X_test = norm_test[["PCR_01", "PCR_02"]]
 y_test = norm_test.spread
 print("test score: " + str(knn.score(X_test, y_test)))
