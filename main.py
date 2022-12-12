@@ -168,3 +168,8 @@ decision_tree = DecisionTreeClassifier(criterion="entropy", max_depth=7, min_sam
 decision_tree.fit(norm_train.drop(["risk","spread"], inplace= False, axis = 1), norm_train.risk)
 
 print("test accuracy is:", decision_tree.score(norm_test.drop(["risk","spread"], inplace= False, axis = 1), norm_test.risk) * 100)
+
+#Q10
+X_train = np.array(norm_train[["PCR_01","PCR_02"]])
+y_train = np.array(norm_train.spread)
+compare_gradients(X_train, y_train, deltas=np.logspace(-9, -1, 12))
