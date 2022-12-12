@@ -122,7 +122,7 @@ plt.xlabel('k')
 plt.ylabel('score')
 plt.title('Cross Validation Train and Validation Scores')
 plt.grid(True)
-plt.legend(["train", "validation"], loc ="lower left")
+plt.legend(["train", "validation"], loc ="upper right")
 plt.show()
 
 
@@ -162,3 +162,9 @@ axes[1].set_title("mean validation accuracy")
 axes[1].set_xlabel("min_samples_leaf")
 axes[1].set_ylabel("max_depth")
 plt.show()
+
+#Q9
+decision_tree = DecisionTreeClassifier(criterion="entropy", max_depth=7, min_samples_leaf=17)
+decision_tree.fit(norm_train.drop(["risk","spread"], inplace= False, axis = 1), norm_train.risk)
+
+print("test accuracy is:", decision_tree.score(norm_test.drop(["risk","spread"], inplace= False, axis = 1), norm_test.risk) * 100)
