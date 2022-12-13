@@ -9,7 +9,6 @@ class SoftSVM(BaseEstimator, ClassifierMixin):
         """
         Initialize an instance of this class.
         ** Do not edit this method **
-
         :param C: inverse strength of regularization. Must be strictly positive.
         :param lr: the SGD learning rate (step size)
         """
@@ -24,7 +23,6 @@ class SoftSVM(BaseEstimator, ClassifierMixin):
         """
         Randomize an initial solution (weight vector)
         ** Do not edit this method **
-
         :param n_features:
         """
         self.w = np.random.randn(n_features)
@@ -34,7 +32,6 @@ class SoftSVM(BaseEstimator, ClassifierMixin):
     def loss(w, b: float, C: float, X, y):
         """
         Compute the SVM objective loss.
-
         :param w: weight vector for linear classification; array of shape (n_features,)
         :param b: bias scalar for linear classification
         :param C: inverse strength of regularization. Must be strictly positive.
@@ -58,7 +55,6 @@ class SoftSVM(BaseEstimator, ClassifierMixin):
     def subgradient(w, b: float, C: float, X, y):
         """
         Compute the (analytical) SVM objective sub-gradient.
-
         :param w: weight vector for linear classification; array of shape (n_features,)
         :param b: bias scalar for linear classification
         :param C: inverse strength of regularization. Must be strictly positive.
@@ -68,6 +64,14 @@ class SoftSVM(BaseEstimator, ClassifierMixin):
         """
         # TODO: calculate the analytical sub-gradient of soft-SVM w.r.t w and b
 
+        # margins = (X.dot(w) + b).reshape(-1, 1)
+        # hinge_inputs = np.multiply(margins, y.reshape(-1, 1))
+        # f_hinge = np.sign(hinge_inputs)
+        # f_y = np.multiply(f_hinge, y.reshape(-1, 1))
+        # g_w = C * X.dot(np.sum(f_y)) + 2*w
+        # g_b = C * np.sum(f_y)
+
+        #NEW
         margins = (X.dot(w) + b).reshape(-1, 1)
         hinge_inputs = np.multiply(margins, y.reshape(-1, 1))
         f = np.where(hinge_inputs<1,-1,0)
@@ -82,7 +86,6 @@ class SoftSVM(BaseEstimator, ClassifierMixin):
     def fit_with_logs(self, X, y, max_iter: int = 2000, keep_losses: bool = True):
         """
         Fit the model according to the given training data.
-
         :param X: training samples; array of shape (n_samples, n_features)
         :param y: training targets (+1 and -1); array of shape (n_samples,)
         :param max_iter: number of SGD iterations
@@ -128,7 +131,6 @@ class SoftSVM(BaseEstimator, ClassifierMixin):
         """
         Fit the model according to the given training data.
         ** Do not edit this method **
-
         :param X: training samples; array of shape (n_samples, n_features)
         :param y: training targets (+1 and -1); array of shape (n_samples,)
         :param max_iter: number of SGD iterations
@@ -140,7 +142,6 @@ class SoftSVM(BaseEstimator, ClassifierMixin):
     def predict(self, X):
         """
         Perform classification on samples in X.
-
         :param X: samples for prediction; array of shape (n_samples, n_features)
         :return: Predicted class labels for samples in X; array of shape (n_samples,)
                  NOTE: the labels must be either +1 or -1
